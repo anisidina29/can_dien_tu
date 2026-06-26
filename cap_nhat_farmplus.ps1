@@ -58,25 +58,38 @@ try {
 }
 
 # Cap nhat database
-Write-Host "[3/3] Cap nhat database (ten cty + MST)..." -ForegroundColor Yellow
+Write-Host "[3/3] Cap nhat database (ten cty, dia chi, MST, SDT)..." -ForegroundColor Yellow
 try {
     $conn = New-Object System.Data.OleDb.OleDbConnection
     $pass = '!@#^%$Nguyen1Van2A3'
     $conn.ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=$mdbPath;Jet OLEDB:Database Password=$pass;"
     $conn.Open()
 
+    # Thong tin cong ty FarmPlus
     $tenCty = "C" + [char]0x00D4 + "NG TY TNHH FARMPLUS"
-    $mst    = "1501164307"
+
+    # Dong 1 phieu can: ten cong ty + MST
+    $diachi = "C" + [char]0x00D4 + "NG TY TNHH FARMPLUS (MST: 1501164307)"
+
+    # Dong 2 phieu can: dia chi + SDT
+    $dienthoai = [char]0x0110 + "C: S" + [char]0x1ED1 + " 44E " `
+        + [char]0x0111 + [char]0x01B0 + [char]0x1EDD + "ng Tr" + [char]0x1EA7 + "n " `
+        + [char]0x0110 + [char]0x1EA1 + "i Ngh" + [char]0x0129 + "a, Ph" `
+        + [char]0x01B0 + [char]0x1EDD + "ng Ph" + [char]0x01B0 + [char]0x1EDB + "c H" + [char]0x1EAD + "u, " `
+        + "T" + [char]0x1EC9 + "nh V" + [char]0x0129 + "nh Long, Vi" + [char]0x1EC7 + "t Nam " `
+        + "S" + [char]0x0110 + "T: 0989799429"
 
     $cmd = $conn.CreateCommand()
-    $cmd.CommandText = "UPDATE giaotiep SET diachi=?, tencty=?, dienthoai=?"
+    $cmd.CommandText = "UPDATE giaotiep SET tencty=?, diachi=?, dienthoai=?"
     $null = $cmd.Parameters.Add("?", [System.Data.OleDb.OleDbType]::VarWChar); $cmd.Parameters[0].Value = $tenCty
-    $null = $cmd.Parameters.Add("?", [System.Data.OleDb.OleDbType]::VarWChar); $cmd.Parameters[1].Value = $tenCty
-    $null = $cmd.Parameters.Add("?", [System.Data.OleDb.OleDbType]::VarWChar); $cmd.Parameters[2].Value = $mst
+    $null = $cmd.Parameters.Add("?", [System.Data.OleDb.OleDbType]::VarWChar); $cmd.Parameters[1].Value = $diachi
+    $null = $cmd.Parameters.Add("?", [System.Data.OleDb.OleDbType]::VarWChar); $cmd.Parameters[2].Value = $dienthoai
 
     $rows = $cmd.ExecuteNonQuery()
     $conn.Close()
-    Write-Host "      Cap nhat thanh cong: ten='$tenCty', mst='$mst' ($rows dong)" -ForegroundColor Green
+    Write-Host "      Cap nhat thanh cong ($rows dong):" -ForegroundColor Green
+    Write-Host "        Dong 1: $diachi" -ForegroundColor Gray
+    Write-Host "        Dong 2: $dienthoai" -ForegroundColor Gray
 } catch {
     Write-Host "      LOI database: $_" -ForegroundColor Red
 }
